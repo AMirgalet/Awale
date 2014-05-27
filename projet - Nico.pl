@@ -1,3 +1,5 @@
+%Verification Github
+
 init:-asserta(etat(j1, [4, 4, 4, 4, 4, 4]) ),
       asserta(etat(j2, [4, 4, 4, 4, 4, 4]) ),
       asserta(joueur(J1)).
