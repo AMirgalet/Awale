@@ -1,36 +1,36 @@
-init:- asserta(playerTable(j1, [4, 4, 4, 4, 4, 4]) ),
-	   asserta(playerTable(j2, [4, 4, 4, 4, 4, 4]) ),
-	   asserta(player(j1) ).
+init:- 	   asserta(Tablejoueur(j1, [4, 4, 4, 4, 4, 4]) ),
+	   asserta(Tablejoueur(j2, [4, 4, 4, 4, 4, 4]) ),
+	   asserta(joueur(j1) ).
 
 main:-  init,
-		playerTurn(X),
-		updateTable( X),
-		playerTable(X, L),
-		printList(L).
+		TourJoueur(X),
+		MajTable( X),
+		Tablejoueur(X, L),
+		imprime_liste(L).
 
-victory(S):- S>=25.
+victoire(S):- S>=25.
 
-playerTurn(X):- player(X),
+TourJoueur(X):- joueur(X),
 				X=j1,
 				!,
-				retract(player(j1)),
-				asserta(player(j2)).
-playerTurn(X):- player(X),
+				retract(joueur(j1)),
+				asserta(joueur(j2)).
+TourJoueur(X):- joueur(X),
 				X=j2,
 				!,
-				retract(player(j2)),
-				asserta(player(j1)).
+				retract(joueur(j2)),
+				asserta(joueur(j1)).
 				
-printList([]).
-printList([T|Q]):- write(T),write('-'),printList(Q).
+imprime_liste([]).
+imprime_liste([T|Q]):- write(T),write('-'),imprime_liste(Q).
 				
-updateTable( joueur) :- playerTable(joueur, [X1, X2, X3, X4, X5, X6]),
+MajTable( joueur) :- Tablejoueur(joueur, [X1, X2, X3, X4, X5, X6]),
 				write('OK'),
-				retract(playerTable(joueur, [X1, X2, X3, X4, X5, X6]) ),
+				retract(Tablejoueur(joueur, [X1, X2, X3, X4, X5, X6]) ),
 				write('OK'),
 				X12 is X1+1,
 				write('OK'),
-				asserta(playerTable(joueur, [X12, X2, X3, X4, X5, X6]) ).
+				asserta(Tablejoueur(joueur, [X12, X2, X3, X4, X5, X6]) ).
 
 
 prendre(X, L, R):- bouclePrendre(1, X, L, R).
