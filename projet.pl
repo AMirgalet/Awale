@@ -66,15 +66,9 @@ majtable(Joueur,PositionDepart,PositionAvancer) :-	tablejoueur(Joueur, Liste),
 							).
 
 
+%Interrogation Joueur
 
-
-
-% Fonction principale du projet
-
-boucle_menu:- repeat,main,!.
-
-main:-  	init,
-		tourjoueur(X),
+jouer:- 	tourjoueur(X),
 		tablejoueur(X,L),
 		write('Tour de : '),write(X),nl,
 		imprime_liste(L),nl,
@@ -84,4 +78,13 @@ main:-  	init,
 		C1 is C-1,
 		majtable(X,C1,C1),
 		tablejoueur(X,L2),
-		imprime_liste(L2),!.
+		imprime_liste(L2),nl,nl,nl,jouer.
+
+
+% Fonction principale du projet
+
+boucle_menu:- repeat,main,!.
+
+main:-  	init,
+		jouer.
+		
