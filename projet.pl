@@ -19,30 +19,27 @@ tourjoueur(X):- joueur(X),
 imprime_liste([]).
 imprime_liste([T|Q]):- write(T),write('-'),imprime_liste(Q).
 				
-majtable(joueur) :- tablejoueur(joueur, [X1, X2, X3, X4, X5, X6]),
-				write('OK'),
-				retract(tablejoueur(joueur, [X1, X2, X3, X4, X5, X6]) ),
-				write('OK'),
-				X12 is X1+1,
-				write('OK'),
-				asserta(tablejoueur(joueur, [X12, X2, X3, X4, X5, X6]) ).
+majtable(Joueur,Position) :-	tablejoueur(Joueur, [X1, X2, X3, X4, X5, X6]),
+				prendre([X1, X2, X3, X4, X5, X6],Position,R),
+				write('Objet a la position demande : '),write(R),nl,
+				retract(tablejoueur(Joueur, [X1, X2, X3, X4, X5, X6]) ),
+				X12 is X1-1,X22 is X2+1,
+				asserta(tablejoueur(Joueur, [X12, X22, X3, X4, X5, X6]) ),
+				!.
 
 
-prendre(X, L, R):- bouclePrendre(1, X, L, R).
-
-bouclePrendre(I, X, [T|Q], R):- I=<X,
-				R = T,
-				NewI is I+1,
-				bouclePrendre(NewI, X, Q, R).
-				
-bouclePrendre(I, X, L, R):- I > X.
-
+prendre(L,X,R):- nth0(X,L,R).
 
 
 boucle_menu:- repeat,main,!.
 
 main:-  	init,
 		tourjoueur(X),
-		majtable(X),
+		write('Tour de : '),write(X),nl,
+		write('---------------------'),nl,
+		write('Choisir une position '),nl,
+		read(C),
+		C1 is C-1,
+		majtable(X,C1),
 		tablejoueur(X,L),
-		imprime_liste(L).
+		imprime_liste(L),!.
