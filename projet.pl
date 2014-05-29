@@ -47,20 +47,23 @@ modifier(Joueur,Liste,Position,Valeur,NouvelleListe):-
 
 % Mise à jour de la table en fonction de l'action demandé par l'utilisateur
 
-majtable(Joueur,Position) :-	tablejoueur(Joueur, Liste),
-				prendre(Liste,Position,R),
-				write('Objet a la position demande : '),write(R),nl,
-				NouvellePosition is Position+1,
-				R > 0 ->
-				(
-					prendre(Liste,NouvellePosition,Value),
-					Value1 is Value+1,
-					modifier(Joueur,Liste,NouvellePosition,Value1,NouvelleListe),
-					retract(tablejoueur(Joueur,Liste)),
- 					asserta(tablejoueur(Joueur,NouvelleListe))
-					%majtable(Joueur,NouvellePosition)
-				);				
-				!.
+majtable(Joueur,PositionDepart,PositionAvancer) :-	tablejoueur(Joueur, Liste),
+							prendre(Liste,PositionDepart,R),
+							write('Objet a la position demande : '),write(R),nl,
+							NouvellePosition is PositionAvancer+1,
+							R > 0 ->
+							(
+								prendre(Liste,NouvellePosition,Value),
+								Value1 is Value+1,
+								modifier(Joueur,Liste,NouvellePosition,Value1,Temp),
+								R1 is R-1,
+								modifier(Joueur,Temp,PositionDepart,R1,NouvelleListe),
+								retract(tablejoueur(Joueur,Liste)),
+ 								asserta(tablejoueur(Joueur,NouvelleListe)),
+ 								R1 > 0 ->
+								majtable(Joueur,PositionDepart,NouvellePosition);
+								write('')
+							).
 
 
 
@@ -72,11 +75,13 @@ boucle_menu:- repeat,main,!.
 
 main:-  	init,
 		tourjoueur(X),
+		tablejoueur(X,L),
 		write('Tour de : '),write(X),nl,
+		imprime_liste(L),nl,
 		write('---------------------'),nl,
 		write('Choisir une position '),nl,
 		read(C),
 		C1 is C-1,
-		majtable(X,C1),
-		tablejoueur(X,L),
-		imprime_liste(L),!.
+		majtable(X,C1,C1),
+		tablejoueur(X,L2),
+		imprime_liste(L2),!.
