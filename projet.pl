@@ -1,6 +1,6 @@
 % Une fonction d'initialisation du plateau de jeu
 init:-	   asserta(tablejoueur(j1,[4, 4, 4, 4, 4, 4]) ),
-	   asserta(tablejoueur(j2,[4, 4, 4, 4, 4, 4]) ),
+		asserta(tablejoueur(j2,[4, 4, 4, 4, 4, 4]) ),
 	   asserta(joueur(j1)).
 
 victoire(S):- S>=25.
@@ -33,13 +33,26 @@ autrejoueur(Y):- joueur(Y).
 imprime_liste([]).
 imprime_liste([T|Q]):- write(T),write('-'),imprime_liste(Q).
 
-affichage(Joueur,Liste):- write(Joueur),write(' : '),imprime_liste(Liste).
+imprime_liste_inversee(L):-inverse(L,L1), imprime_liste(L1).
 
+%affichage(Joueur,Liste):- write(Joueur),write(' : '),imprime_liste(Liste).
+
+affichage(JoueurUn, ListeUn, JoueurDeux, ListeDeux):-
+				write('  ______________'),nl,
+				write(JoueurDeux),write('|'),imprime_liste_inversee(ListeDeux),write('|'),nl,
+				write('  |____________|'),nl,
+				write(JoueurUn),write('|'),imprime_liste(ListeUn),write('|'),nl,
+				write('  |____________|'),nl.
 
 
 %Pour récupérer un element en position X dans une liste L 
 prendre(L,X,R):- nth0(X,L,R).	
 
+%Fonction d'inversion de liste
+inverse(L1, L2):-inverse(L1, [], L2).
+
+inverse([], Acc,Acc).
+inverse([X|Rest], Acc,Result):-inverse(Rest, [X|Acc], Result).
 
 %Pour modifier l'objet en position Position de la liste Joueur avec la valeur Valeur, et la nouvelle liste est retournée dans NouveauJoueur
 modifier(Liste,Position,Valeur,NouvelleListe):-  
@@ -59,6 +72,8 @@ deplacer(Joueur,Liste,Position,PositionDepart,R1):-
 		Value1 is Value+1,
 		modifier(Liste,Position,Value1,Temp),
 		R1 is R-1,
+		%write('R :'),write(R),nl,
+		%write('R1 : '),write(R1),nl,
 		modifier(Temp,PositionDepart,R1,NouvelleListe),
 		retract(tablejoueur(Joueur,Liste)),
  		asserta(tablejoueur(Joueur,NouvelleListe)).
@@ -75,28 +90,29 @@ majtable(Joueur,Autre,PositionDepart,PositionAvancer) :-
 							NouvellePosition is PositionAvancer+1,
 							R > 0 ->
 							(
-								R < 5 -> (
-								deplacer(Joueur,Liste,NouvellePosition,PositionDepart,R1);
-								write('')),
-								R1 > 0 ->(
-								majtable(Joueur,PositionDepart,NouvellePosition); write(' '))
+								deplacer(Joueur,Liste,NouvellePosition,PositionDepart,R1),
+ 								R1 > 0 ->
+								majtable(Joueur,Autre,PositionDepart,NouvellePosition);
+								write('')
 							).
-
 
 %Interrogation Joueur
 
 jouer:- 	tourjoueur(X),
 		autrejoueur(Y),
 		tablejoueur(X,L),
+		tablejoueur(Y,Y2),
+		affichage(X,L,Y,Y2),nl,
 		write('Tour de : '),write(X),nl,
-		imprime_liste(L),nl,
-		write('---------------------'),nl,
 		write('Choisir une position '),nl,
 		read(C),
 		C1 is C-1,
 		majtable(X,Y,C1,C1),
 		tablejoueur(X,L2),
-		affichage(X,L2),nl,nl,nl,jouer.
+		tablejoueur(Y,Y2),
+		%affichage(X,L2,Y,Y2),nl,
+		
+		jouer.
 
 
 % Fonction principale du projet
