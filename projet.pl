@@ -198,9 +198,16 @@ jouer:- 	tourjoueur(X),
 		write('Choisir une position '),nl,
 		read(C),
 		C1 is C-1,
-		(C1 < 6 ->
-		majtable(X,Y,C1,C1);
-		write('Valeur incorrect,rejouer'),tourjoueur(X)
+		prendre(L,C1,R),
+		(C > 6 ->
+			write('Valeur trop grande,rejouer'),tourjoueur(X);
+			(C < 1 ->
+				write('Valeur négative impossible, veuillez choisir une autre position'),tourjoueur(X);
+				(R =\= 0 ->
+					majtable(X,Y,C1,C1);
+					write('Impossible, nombre de graine nul, veuillez choisir une autre position'),tourjoueur(X)
+				)
+			)
 		),
 		jouer.
 
