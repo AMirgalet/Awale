@@ -198,7 +198,10 @@ jouer:- 	tourjoueur(X),
 		write('Choisir une position '),nl,
 		read(C),
 		C1 is C-1,
-		majtable(X,Y,C1,C1),
+		(C1 < 6 ->
+		majtable(X,Y,C1,C1);
+		write('Valeur incorrect,rejouer'),tourjoueur(X)
+		),
 		jouer.
 
 % Fonction principale du projet
