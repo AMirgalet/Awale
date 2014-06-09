@@ -198,17 +198,17 @@ jouer:- 	tourjoueur(X),
 		write('Choisir une position '),nl,
 		read(C),
 		C1 is C-1,
-		prendre(L,C1,R),
-		(C > 6 ->
-			write('Valeur trop grande,rejouer'),tourjoueur(X);
-			(C < 1 ->
-				write('Valeur négative impossible, veuillez choisir une autre position'),tourjoueur(X);
-				(R =\= 0 ->
-					majtable(X,Y,C1,C1);
-					write('Impossible, nombre de graine nul, veuillez choisir une autre position'),tourjoueur(X)
+		(C1 > 5 ->
+			write('Valeur trop grande,rejouer une position entre 1 et 6'),nl,tourjoueur(X)
+			; (C1 < 0 ->
+				write('Valeur négative ou nul impossible, veuillez choisir une autre position entre 1 et 6'),nl,tourjoueur(X)
+				; 	prendre(L,C1,R),
+					(R =\= 0 ->
+					majtable(X,Y,C1,C1)
+					; write('Impossible, nombre de graine nul, veuillez choisir une autre position'),nl,tourjoueur(X)
+				         )
 				)
-			)
-		),
+			),
 		jouer.
 
 % Fonction principale du projet
