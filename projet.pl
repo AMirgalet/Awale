@@ -1,7 +1,8 @@
 % Une fonction d'initialisation du plateau de jeu
 init:-		asserta(tablejoueur(j1,[4, 4, 4, 4, 4, 4],0) ),
 		asserta(tablejoueur(j2,[4, 4, 4,4, 4, 4],0) ),
-	    	asserta(joueur(j2)).
+	    	asserta(joueur(j2)),
+	    	asserta(possible(99)).	
 
 %--------------------------------------------------
 
@@ -307,23 +308,56 @@ majtable(Joueur,Autre,PositionDepart,PositionAvancer) :-
 								)
 							).
 
+%----------------------------------------------------------------------------%
 % Fonction permettant de connaitre les coups engendrant une prise
-
 coup_prise(Joueur,Autre) :-
 			tablejoueur(Joueur, Liste, PointsUn),
 			tablejoueur(Autre,ListeAutre, PointsDeux),
-			parcoure(ListeAutre,Compteur).
+			parcoure(ListeAutre,Compteur),
+			test(Liste,5).
+			
 
+% Fonction qui selectionne toute les positions possible de de prise possible sans prise en compte de la liste du joueur courant
 parcoure([],0).
 parcoure([X|Q],Compteur):- 
 		X=<2,
 		X>0,
 		parcoure(Q,Compteur1),
 		Compteur is Compteur1+1,
-		write('Prise en Position '),write(Compteur),nl.
+		Resultat is 6-Compteur1,
+		asserta(possible(Resultat)).
 		
 		
 parcoure([X|Q],Compteur) :- parcoure(Q,Compteur1),Compteur is Compteur1+1.
+
+%Fonction prenant en compte la liste du joueur courant
+
+test(Liste,-1).
+test(Liste,Position):- 	possible(X),
+			(X  =\=  99 ->
+				prendre(Liste,Position,Y),	
+				Z is Position+Y+1,
+				(Z =< 6 ->
+					write('');
+					(Z >12 ->
+						write('');
+						B is X+6,
+						(Z == B ->
+							write('Prise possible si tu joues :  '),Position_S is Position+1,write(Position_S),nl
+						)
+					)
+				);
+				write('')
+			),
+			Position1 is Position-1,
+			test(Liste,Position1).
+					
+		
+
+
+
+
+%_--------------------------------------------------------------------------------------%
 		
 
 %Interrogation Joueur
@@ -354,7 +388,6 @@ jouer:-
 				)
 			)
 		),
-		
 		verification_fin(X,Y).
 
 % Fonction principale du projet
