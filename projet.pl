@@ -332,7 +332,11 @@ parcoure([X|Q],Compteur) :- parcoure(Q,Compteur1),Compteur is Compteur1+1.
 
 %Fonction prenant en compte la liste du joueur courant
 
+% Reste à faire 
+ %Parcours de tous les X stockée dans possible. Ici on teste un seul de ces "possible"
+
 test(Liste,-1).
+		
 test(Liste,Position):- 	possible(X),
 			(X  =\=  99 ->
 				prendre(Liste,Position,Y),	
