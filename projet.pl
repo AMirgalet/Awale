@@ -17,7 +17,23 @@ tourjoueur(X):- joueur(X),
 		).
 
 autrejoueur(Y):- joueur(Y).
+		
+joueursuivant:-
+		joueur(X),
+		(X==j1->
+		!,retract(joueur(_)),
+		asserta(joueur(j2));
+		!,retract(joueur(_)),
+		asserta(joueur(j1))
+		).
 
+adversaire(Y):-
+		joueur(X),
+		(X==j1->
+			Y=j2
+		;
+			Y=j1
+		).
 
 %--------------------------------------------------
 
@@ -195,8 +211,9 @@ majtable(Joueur,Autre,PositionDepart,PositionAvancer) :-
 
 %Interrogation Joueur
 
-jouer:- 	tourjoueur(X),
-		autrejoueur(Y),
+jouer:-
+		joueur(X),
+		adversaire(Y),
 		tablejoueur(X,L,P),
 		tablejoueur(Y,Y2,P2),
 		affichage(X,L,P,Y,Y2,P2),nl,
@@ -205,21 +222,28 @@ jouer:- 	tourjoueur(X),
 		read(C),
 		C1 is C-1,
 		(C1 > 5 ->
-			write('Valeur trop grande,rejouer une position entre 1 et 6'),nl,tourjoueur(X)
-			; (C1 < 0 ->
-				write('Valeur négative ou nul impossible, veuillez choisir une autre position entre 1 et 6'),nl,tourjoueur(X)
-				; 	prendre(L,C1,R),
-					(R =\= 0 ->
-					majtable(X,Y,C1,C1)
-					; write('Impossible, nombre de graine nul, veuillez choisir une autre position'),nl,tourjoueur(X)
-				         )
+			write('Valeur trop grande,rejouer une position entre 1 et 6'), nl%, !
+		;
+			(C1 < 0 ->
+				write('Valeur négative ou nul impossible, veuillez choisir une autre position entre 1 et 6'), nl%, !
+			;
+				prendre(L,C1,R),
+				(R =\= 0 ->
+					majtable(X,Y,C1,C1),
+					joueursuivant
+				;
+					write('Impossible, nombre de graine nul, veuillez choisir une autre position'), nl%, !
 				)
-			),
+			)
+		),
+		
 		jouer.
 
 % Fonction principale du projet
 
-boucle_menu:- init,repeat,jouer,!.
+boucle_menu:- repeat,jouer,!.
+
+main:- init, boucle_menu.
 
 
 		
