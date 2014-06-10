@@ -193,6 +193,25 @@ majtable(Joueur,Autre,PositionDepart,PositionAvancer) :-
 								)
 							).
 
+% Fonction permettant de connaitre les coups engendrant une prise
+
+coup_prise(Joueur,Autre) :-
+			tablejoueur(Joueur, Liste, PointsUn),
+			tablejoueur(Autre,ListeAutre, PointsDeux),
+			parcoure(ListeAutre,Compteur).
+
+parcoure([],0).
+parcoure([X|Q],Compteur):- 
+		X=<2,
+		X>0,
+		parcoure(Q,Compteur1),
+		Compteur is Compteur1+1,
+		write('Prise en Position '),write(Compteur),nl.
+		
+		
+parcoure([X|Q],Compteur) :- parcoure(Q,Compteur1),Compteur is Compteur1+1.
+		
+
 %Interrogation Joueur
 
 jouer:- 	tourjoueur(X),
@@ -201,6 +220,7 @@ jouer:- 	tourjoueur(X),
 		tablejoueur(Y,Y2,P2),
 		affichage(X,L,P,Y,Y2,P2),nl,
 		write('Tour de : '),write(X),nl,
+		coup_prise(X,Y),
 		write('Choisir une position '),nl,
 		read(C),
 		C1 is C-1,
