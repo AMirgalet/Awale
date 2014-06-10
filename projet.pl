@@ -1,6 +1,6 @@
 % Une fonction d'initialisation du plateau de jeu
 init:-		asserta(tablejoueur(j1,[4, 4, 4, 4, 4, 4],0) ),
-		asserta(tablejoueur(j2,[4, 4, 4, 4, 4, 4],0) ),
+		asserta(tablejoueur(j2,[4, 4, 4,4, 4, 4],0) ),
 	    	asserta(joueur(j2)).
 
 victoire(S):- S>=25.
@@ -10,9 +10,9 @@ victoire(S):- S>=25.
 %Fonction permettant de connaitre qui joue
 tourjoueur(X):- joueur(X),
 		(X==j1->
-		retract(joueur(_)),
+		!,retract(joueur(_)),
 		asserta(joueur(j2));
-		retract(joueur(_)),
+		!,retract(joueur(_)),
 		asserta(joueur(j1))
 		).
 
@@ -65,13 +65,15 @@ verif_compte_points(Joueur, Autre, Position, 0, Value):-
 verif_compte_points(_,_,_,_,_).
 %Verif_compte_points verifie que nous sommes bien arrivé à la fin du coup du jouer grace à la condition R1=0
 
-%?? Predicat faux
-%verif_valeur_points(Joueur,Autre,0,_):-
-%		pts(Joueur, Autre, 0),
-%		!.
-% Sami je les laissé car je sais pas pourquoi tu avais mis celui la? Pour moi il sert à rien mais il doit avoir un intéret. En tout cas il est 
-% responsable d'un beug car peut importe le nombre de graine en position 1 du joueur adverse, si tu finis à cette position tu récuperes tous. 
-% Maintenant qu'il n'y ai plus, le beug vient lorsque l'on a une prise en position 0. Ca reprend le score de 0.
+
+verif_valeur_points(Joueur,Autre,0,2):-
+		pts(Joueur, Autre, 0),
+	!.
+
+verif_valeur_points(Joueur,Autre,0,3):-
+		pts(Joueur, Autre, 0),
+	!.
+
 
 		
 verif_valeur_points(Joueur,Autre, Position, 2):-
@@ -217,8 +219,7 @@ jouer:- 	tourjoueur(X),
 
 % Fonction principale du projet
 
-boucle_menu:- repeat,main,!.
+boucle_menu:- init,repeat,jouer,!.
 
-main:-  	init,
-		jouer.
+
 		
