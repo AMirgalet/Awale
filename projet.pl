@@ -1,22 +1,12 @@
 % Une fonction d'initialisation du plateau de jeu
-init:-		asserta(tablejoueur(j1,[4, 4, 4, 4, 4, 4],0) ),
-		asserta(tablejoueur(j2,[4, 4, 4,4, 4, 4],0) ),
+init:-		asserta(tablejoueur(j1,[4, 4, 4, 4, 4, 4], 0) ),
+			asserta(tablejoueur(j2,[4, 4, 4, 4, 4, 4], 0) ),
 	    	asserta(joueur(j2)),
 	    	asserta(possible(99)).	
 
 %--------------------------------------------------
 
-%Fonction permettant de connaitre qui joue
-tourjoueur(X):- joueur(X),
-		(X==j1->
-		!,retract(joueur(_)),
-		asserta(joueur(j2));
-		!,retract(joueur(_)),
-		asserta(joueur(j1))
-		).
-
-autrejoueur(Y):- joueur(Y).
-		
+% Permet de passer au joueur suivant	
 joueursuivant:-
 		joueur(X),
 		(X==j1->
@@ -26,6 +16,7 @@ joueursuivant:-
 		asserta(joueur(j1))
 		).
 
+% Permet de retourner l'adversaire du joueur courant
 adversaire(Y):-
 		joueur(X),
 		(X==j1->
@@ -37,7 +28,7 @@ adversaire(Y):-
 %--------------------------------------------------
 
 
-%Ici nous placons toute nos fonctions dites usuelle ou de base
+%Ici nous plaçons toute nos fonctions dites usuelle ou de base
 
 % Fonction d'affichage
 imprime_liste([]).
@@ -254,7 +245,7 @@ verification_fin(Joueur,Autre):-
 		tablejoueur(Joueur, Liste, Points),
 		tablejoueur(Autre,ListeAutre, PointsAutre),
 		( Points > 24 ->
-				write('arrive la'),nl,
+				write('arrive la'),nl, % arrive là ?! c'est un printf de test ?
 				victoire(Joueur)
 		;
 				verif_blocage(Joueur, Autre, Retour),
@@ -342,26 +333,32 @@ test(Liste,Position):- 	possible(X),
 				prendre(Liste,Position,Y),	
 				Z is Position+Y+1,
 				(Z =< 6 ->
-					write('');
+					write('') % Pourquoi mettre un write si on marque rien ? Oo
+								% D'autant que lorsqu'il arrive là, il fait rien de plus, et la position fait 6, 5, 4, 3, 2, 1, 0, -1 sans rien faire
+				;
 					(Z >12 ->
-						write('');
+						write('') % Même chose
+					;
 						B is X+6,
 						(Z == B ->
-							write('Prise possible si tu joues :  '),Position_S is Position+1,write(Position_S),nl
+							write('Prise possible si tu joues :  ') , Position_S is Position+1, write(Position_S), nl
 						)
 					)
-				);
+				)
+			;
 				write('')
 			),
 			Position1 is Position-1,
 			test(Liste,Position1).
 					
 		
+victoire_en_un_coup:-
+		joueur(Joueur),
+		adversaire(Adversaire),
 
 
 
-
-%_--------------------------------------------------------------------------------------%
+%---------------------------------------------------------------------------------------%
 		
 
 %Interrogation Joueur
