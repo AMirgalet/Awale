@@ -252,18 +252,18 @@ verif_liste_autre(Liste, Position, Retour):-
 		
 	%On verifie si on est en position de blocage en fin de jeu
 verif_blocage(Joueur,Autre, RetourVerif):-
-		tablejoueur(Joueur, Liste, Points),
-		tablejoueur(Autre,ListeAutre, PointsAutre),
+		tablejoueur(Joueur, Liste, _),
+		tablejoueur(Autre,ListeAutre, _),
 		verif_position_zero(Liste, 0, 0, Retour),
 		( Retour > 0 ->
-				verif_liste_autre(ListeAutre, 5, RetourAutre),
-				RetourVerif is RetourAutre;
-				write('')
+			verif_liste_autre(ListeAutre, 5, RetourAutre),
+			RetourVerif is RetourAutre
+		;
+			write('')
 		).
 		
 	%On compte les points restants sur le plateau pour les ajouter au score final		
-prendre_points_fin(Joueur, 6, NewPoints):-
-		!.
+prendre_points_fin( _, 6, _):- !.
 		
 prendre_points_fin(Joueur, Position, PointsTemp):-
 		tablejoueur(Joueur, Liste, Points),
@@ -277,11 +277,11 @@ prendre_points_fin(Joueur, Position, PointsTemp):-
 
 	%Le jeu est en blocage, on compte donc les points pour connaitre le vainqueur
 fin_jeu_decompte_points(Joueur,Autre):-
-		prendre_points_fin(Joueur, 0, NewPoints),
-		tablejoueur(Joueur, Liste, Points),
+		prendre_points_fin(Joueur, 0, _),
+		tablejoueur(Joueur, _, Points),
 		write('final: '),write(Points),nl,
-		prendre_points_fin(Autre, 0, NewPointsAutre),
-		tablejoueur(Autre, ListeAutre, PointsAutre),
+		prendre_points_fin(Autre, 0, _),
+		tablejoueur(Autre, _, PointsAutre),
 		write('final: '),write(PointsAutre),nl,
 		( Points > PointsAutre ->
 				victoire(Joueur);
@@ -292,8 +292,8 @@ fin_jeu_decompte_points(Joueur,Autre):-
 		).
 		
 verification_fin(Joueur,Autre):-
-		tablejoueur(Joueur, Liste, Points),
-		tablejoueur(Autre,ListeAutre, PointsAutre),
+		tablejoueur(Joueur, _, Points),
+		tablejoueur(Autre,_, _),
 		( Points > 24 ->
 				write('arrive la'),nl, % arrive là ?! c'est un printf de test ?
 				victoire(Joueur)
@@ -313,8 +313,8 @@ verification_fin(Joueur,Autre):-
 
 	% Mise à jour de la table en fonction de l'action demandé par l'utilisateur
 majtable(Joueur,Autre,PositionDepart,PositionAvancer) :-	
-							tablejoueur(Joueur, Liste, PointsUn),
-							tablejoueur(Autre,ListeAutre, PointsDeux),
+							tablejoueur(Joueur, Liste, _),
+							tablejoueur(Autre, _, _),
 							prendre(Liste,PositionDepart,R),
 							%R est la valeur de la case choisie
 							NouvellePosition is PositionAvancer+1,
@@ -362,9 +362,9 @@ majtable(Joueur,Autre,PositionDepart,PositionAvancer) :-
 %
 	% Fonction permettant de connaitre les coups engendrant une prise
 coup_prise(Joueur,Autre) :-
-			tablejoueur(Joueur, Liste, PointsUn),
-			tablejoueur(Autre,ListeAutre, PointsDeux),
-			parcoure(ListeAutre,Compteur),
+			tablejoueur(Joueur, Liste, _),
+			tablejoueur(Autre,ListeAutre, _),
+			parcoure(ListeAutre, _),
 			test(Liste,5).
 
 	% Fonction qui selectionne toute les positions possible de de prise possible sans prise en compte de la liste du joueur courant
@@ -376,7 +376,7 @@ parcoure([X|Q], Compteur):-
 		Compteur is Compteur1+1,
 		Resultat is 6-Compteur1,
 		asserta(possible(Resultat)).
-parcoure([X|Q],Compteur) :-
+parcoure([_|Q],Compteur) :-
 		parcoure(Q,Compteur1),
 		Compteur is Compteur1+1.
 
@@ -385,7 +385,7 @@ parcoure([X|Q],Compteur) :-
 % Reste à faire 
  %Parcours de tous les X stockée dans possible. Ici on teste un seul de ces "possible"
 
-test(Liste,-1).
+test( _,-1).
 		
 test(Liste,Position):- 	possible(X),
 			(X  =\=  99 ->
