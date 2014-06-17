@@ -1,22 +1,43 @@
-% Une fonction d'initialisation du plateau de jeu
-init:-		asserta(tablejoueur(j1,[4, 4, 4, 4, 4, 4], 0) ),
-			asserta(tablejoueur(j2,[4, 4, 4, 4, 4, 4], 0) ),
-	    	asserta(joueur(j2)),
-	    	asserta(possible(99)).	
+% ---------------------------------------------------
+% ------------------- AWALE -------------------------
+% ---------------------------------------------------
+% 
+% Projet réalisé dans le cadre de l'UV IA02 de l'Université de Technologie de Compiègne (UTC).
+%
+% Membres du groupe:	Sami 		Yacoubi
+% 						Nicolas 	Szewe
+%						Alexandre 	Mirgalet
+%
+%
+%
+% ---------------------------------------------------
+% -----		FONCTIONS DE BASE
+% ---------------------------------------------------
+%
+% Ici nous plaçons toute nos fonctions dites usuelle ou de base
+%
 
-%--------------------------------------------------
+	% Une fonction d'initialisation du plateau de jeu
+init:-	asserta(tablejoueur(j1,[4, 4, 4, 4, 4, 4], 0) ),
+		asserta(tablejoueur(j2,[4, 4, 4, 4, 4, 4], 0) ),
+	    asserta(joueur(j2)),
+	    asserta(possible(99)).	
+			
 
-% Permet de passer au joueur suivant	
+	% Permet de passer au joueur suivant	
 joueursuivant:-
-		joueur(X),
+		joueur(X),	% On récupère le joueur actuel, et on change le prédicat en mémoire en fonction de cette valeur.
 		(X==j1->
-		!,retract(joueur(_)),
-		asserta(joueur(j2));
-		!,retract(joueur(_)),
-		asserta(joueur(j1))
+			!,
+			retract(joueur(_) ),
+			asserta(joueur(j2) )
+		;
+			!,
+			retract(joueur(_) ),
+			asserta(joueur(j1) )
 		).
 
-% Permet de retourner l'adversaire du joueur courant
+	% Permet de retourner l'adversaire du joueur courant
 adversaire(Y):-
 		joueur(X),
 		(X==j1->
@@ -25,93 +46,136 @@ adversaire(Y):-
 			Y=j1
 		).
 
-%--------------------------------------------------
-
-
-%Ici nous plaçons toute nos fonctions dites usuelle ou de base
-
-% Fonction d'affichage
-imprime_liste([]).
-imprime_liste([T|Q]):- write(T),write('-'),imprime_liste(Q).
-
-imprime_liste_inversee(L):-inverse(L,L1), imprime_liste(L1).
-
-%affichage(Joueur,Liste):- write(Joueur),write(' : '),imprime_liste(Liste).
-
-affichage(JoueurUn, ListeUn, PtsUn, JoueurDeux, ListeDeux, PtsDeux):-
-				write('  ______________'),nl,
-				write(JoueurDeux),write('|'),imprime_liste_inversee(ListeDeux),write('|'),write('Score: '),write(PtsDeux),nl,
-				write('  |____________|'),nl,
-				write(JoueurUn),write('|'),imprime_liste(ListeUn),write('|'),write('Score: '),write(PtsUn),nl,
-				write('  |____________|'),nl.
-
-
-%Pour récupérer un element en position X dans une liste L 
+	% Récupère l'élément en position X dans lal liste L
 prendre(L,X,R):- nth0(X,L,R).	
 
-%Fonction d'inversion de liste
+	% Inverse la liste L1 et la renvoie dans L2
 inverse(L1, L2):-inverse(L1, [], L2).
 
-inverse([], Acc,Acc).
-inverse([X|Rest], Acc,Result):-inverse(Rest, [X|Acc], Result).
+inverse([], L2, L2).
+inverse([X|Rest], Tmp, L2):-
+	inverse(Rest, [X|Tmp], L2).
 
-%Pour modifier l'objet en position Position de la liste Joueur avec la valeur Valeur, et la nouvelle liste est retournée dans NouveauJoueur
-modifier(Liste,Position,Valeur,NouvelleListe):-  
-   	 length(Temporaire, Position),
-    	 append(Temporaire, [_|Tail], Liste),
-    	 append(Temporaire, [Valeur|Tail], NouvelleListe).
+	% Modifie la valeur de l'élément en position Position avec la valeur Valeur, et retourne la nouvelle liste dans NouvelleListe
+modifier(Liste, Position, Valeur, NouvelleListe):-  
+   	length(Temporaire, Position), % Créé une liste Temporaire de longueur Position
+    append(Temporaire, [_|Tail], Liste), % Permet d'obtenir Tail, c'est à dire la liste des éléments suivant l'élément à la position Position
+    append(Temporaire, [Valeur|Tail], NouvelleListe).
 
-	
+% replace([_|T], 0, X, [X|T]).
+% replace([H|T], I, X, [H|R]):-
+	% I > -1,
+	% NI is I-1,
+	% replace(T, NI, X, R),
+	% !.
+% replace(L, _, _, L).
 
-%--------------------------------------------------------------------
 
-verif_compte_points(Joueur, Autre, Position, 0, Value):-
-		verif_valeur_points(Joueur, Autre, Position, Value),
+% ---------------------------------------------------
+% -----		FONCTIONS D'AFFICHAGE
+% ---------------------------------------------------
+%
+% Ici nous plaçons toute nos fonctions dites usuelle ou de base
+%
+
+	% Imprime la liste passée en argument
+imprime_liste([Q]):-
+		write(Q).
+imprime_liste([T|Q]):-
+		write(T),
+		write('-'),
+		imprime_liste(Q).
+
+	% Imprime la liste passée en argument de manière inversée
+imprime_liste_inversee(L):-
+		inverse(L, L1),
+		imprime_liste(L1).
+
+	% Affiche l'état du jeu en cours
+affichage(JoueurUn, ListeUn, PtsUn, JoueurDeux, ListeDeux, PtsDeux):-
+				write('   ___________'), nl,
+					write(JoueurDeux),
+					write('|'),
+					imprime_liste_inversee(ListeDeux),
+					write('|'),
+					write('Score: '),
+					write(PtsDeux),
+					nl,
+				write('  |___________|'), nl,
+					write(JoueurUn),
+					write('|'),
+					imprime_liste(ListeUn),
+					write('|'),
+					write('Score: '),
+					write(PtsUn),
+					nl,
+				write('  |___________|'), nl.
+				
+	% Affichage en cas de victoire d'un des joueurs
+victoire( Joueur):-
+		tablejoueur( Joueur, _, Points),
+		write(' Victoire du joueur: '),
+		write( Joueur),
+		write(' avec un score de '),
+		write(Points).
+
+	% Affichage en cas d'égalité
+egalite:-
+		write('Egalite entre les deux joueurs!').
+
+
+% ---------------------------------------------------
+% -----		FONCTIONS DE VERIFICATION
+% ---------------------------------------------------
+%
+% Nous avons ici les fonctions de vérification
+%
+
+verif_compte_points( Joueur, Autre, Position, 0, Value):-
+		verif_valeur_points( Joueur, Autre, Position, Value),
 		!.
-verif_compte_points(_,_,_,_,_).
-%Verif_compte_points verifie que nous sommes bien arrivé à la fin du coup du jouer grace à la condition R1=0
+verif_compte_points( _, _, _, _, _).
+% Verif_compte_points verifie que nous sommes bien arrivé à la fin du coup du jouer grace à la condition R1=0
 
 
-verif_valeur_points(Joueur,Autre,0,2):-
-		pts(Joueur, Autre, 0),
-	!.
+verif_valeur_points( Joueur, Autre, 0, 2):-
+		pts( Joueur, Autre, 0), !.
+verif_valeur_points( Joueur, Autre, 0, 3):-
+		pts( Joueur, Autre, 0), !.
+verif_valeur_points( Joueur, Autre, Position, 2):-
+		pts( Joueur, Autre, Position, 2), !.
+verif_valeur_points( Joueur, Autre, Position, 3):-
+		pts( Joueur, Autre, Position, 3), !.
+verif_valeur_points( _, _, _, _).
+% Cette dernière condition exclue toute possibilité de point si on arrive sur une zone adverse ou il y a plus de 3 graines.
 
-verif_valeur_points(Joueur,Autre,0,3):-
-		pts(Joueur, Autre, 0),
-	!.
+% ---------------------------------------------------
+% -----		FONCTIONS DE JEU
+% ---------------------------------------------------
+%
+% Nous avons ici les fonctions qui servent au fonctionnement du jeu
+%
 
-
-		
-verif_valeur_points(Joueur,Autre, Position, 2):-
-		pts(Joueur,Autre, Position, 2),
-		!.
-verif_valeur_points(Joueur,Autre, Position, 3):-
-		pts(Joueur,Autre, Position, 3),
-		!.
-verif_valeur_points(Joueur,Autre,_,_).
-% Dernière condition qui exclue toute possibilité de point si on arrive sur une zone adverse ou il y a plus de 3 graines. 
-			
-
-pts(Joueur, Autre, Position):-
-		tablejoueur(Joueur, Liste, Points),
-		tablejoueur(Autre, ListeAutre, PointsAutre),
-		prendre(ListeAutre,Position,Value),
+	% Fonction de calcul de points
+pts( Joueur, Autre, Position):-
+		tablejoueur( Joueur, Liste, Points),
+		tablejoueur( Autre, ListeAutre, PointsAutre),
+		prendre( ListeAutre, Position,Value),
 		NewPoints is Points + Value,
-		retract(tablejoueur(Joueur,Liste, Points)),
- 		asserta(tablejoueur(Joueur,Liste, NewPoints)),
-		NewValue is Value - Value,
-		modifier(ListeAutre,Position,NewValue,Temp),
-		retract(tablejoueur(Autre,ListeAutre, PointsAutre)),
- 		asserta(tablejoueur(Autre,Temp, PointsAutre)).
+		retract( tablejoueur( Joueur, Liste, Points)),
+ 		asserta( tablejoueur( Joueur, Liste, NewPoints)),	% Mise à jour des points
+		NewValue is Value - Value,	% On peut pas mettre 0 directement ?
+		modifier( ListeAutre, Position, NewValue, Temp),	% Mise à jour de la table
+		retract(tablejoueur(Autre, ListeAutre, PointsAutre)),
+ 		asserta(tablejoueur(Autre, Temp, PointsAutre)).
 
-		
-pts(Joueur, Autre, Position, Value):-
-		tablejoueur(Joueur, Liste, Points),
+pts( Joueur, Autre, Position, Value):-
+		tablejoueur( Joueur, Liste, Points),
 		NewPoints is Points + Value,
-		retract(tablejoueur(Joueur,Liste, Points)),
- 		asserta(tablejoueur(Joueur,Liste, NewPoints)),
+		retract( tablejoueur( Joueur, Liste, Points)),
+ 		asserta( tablejoueur( Joueur, Liste, NewPoints)),
 		tablejoueur(Autre, ListeAutre, PointsAutre),
-		NewValue is Value - Value,
+		NewValue is Value - Value, % On peut pas mettre 0 directement ?
 		modifier(ListeAutre,Position,NewValue,Temp),
 		retract(tablejoueur(Autre,ListeAutre, PointsAutre)),
  		asserta(tablejoueur(Autre,Temp, PointsAutre)),
@@ -121,59 +185,44 @@ pts(Joueur, Autre, Position, Value):-
 		
 		
 
-% Pour déplacer une graine d'un état i à un état i+1 dans une seule chaine
+	% Pour déplacer une graine d'un état i à un état i+1 dans une seule chaine
+deplacer( Joueur, Autre, Position, PositionDepart, R1):- 
+		tablejoueur( Joueur, Liste, _),
+		tablejoueur( Autre, _, _),
+		prendre( Liste, Position, Value),	%Value est la valeur de la case que l'on va incrémenter
+		NewValue is Value+1,
+		prendre( Liste, PositionDepart, R),	%R est la valeur actuelle de la case de départ
+											%	donc le nombre de graines restantes à répartir
+		R1 is R-1,
+		modifier( Liste, Position, NewValue, Tmp), 			% Tmp est la liste temporaire où seul l'élément à la position Position a été modifié
+		modifier( Tmp, PositionDepart, R1, NouvelleListe),	% NouvelleListe est donc la liste où les deux valeurs ont été modifiées
+		retract(tablejoueur( Joueur, Liste, Points)),
+ 		asserta(tablejoueur( Joueur, NouvelleListe, Points)). % On enregistre le nouvel etat du joueur Joueur.
 
-deplacer(Joueur,Autre,Position,PositionDepart,R1):- 
-		tablejoueur(Joueur, Liste, PointsUn),
-		tablejoueur(Autre,ListeAutre, PointsDeux),
-		prendre(Liste,Position,Value),
-		%Value est la valeur de la case a laquelle on ajoute 1
-		prendre(Liste,PositionDepart,R),
-		%R est la valeur actuelle de la case de départ
-		R1 is R-1,
+	% Pour déplacer une graine d'un état i à un état i+1 dans les deux chaines
+deplacer_deux_listes( Joueur, Autre, Position, PositionDepart, R1):- 
+		tablejoueur( Joueur, Liste, PointsUn),
+		tablejoueur( Autre, ListeAutre, PointsDeux),
+		prendre( ListeAutre, Position, Value),	% Value est la valeur de la case que l'on va incrémenter
 		Value1 is Value+1,
-		modifier(Liste,Position,Value1,Temp),
-		%Temp est la nouvelle liste modifiee
-		modifier(Temp,PositionDepart,R1,NouvelleListe),
-		%NouvelleListe est la nouvelle liste modifiee
-		retract(tablejoueur(Joueur,Liste, Points)),
- 		asserta(tablejoueur(Joueur,NouvelleListe, Points)).
-		
-% Pour déplacer une graine d'un état i à un état i+1 dans les deux chaines
-	
-deplacer_deux_listes(Joueur,Autre,Position,PositionDepart,R1):- 
-		tablejoueur(Joueur, Liste, PointsUn),
-		tablejoueur(Autre,ListeAutre, PointsDeux),
-		prendre(ListeAutre,Position,Value),
-		%Value est la valeur de la case a laquelle on ajoute 1
-		prendre(Liste,PositionDepart,R),
-		%R est la valeur actuelle de la case de départ
+		prendre( Liste, PositionDepart, R),		% R est la valeur actuelle de la case de départ
+													%	donc le nombre de graines restantes à répartir
 		R1 is R-1,
-		Value1 is Value+1,
-		modifier(ListeAutre,Position,Value1,Temp),
-		%Temp est la nouvelle liste modifiee
-		modifier(Liste,PositionDepart,R1,NouvelleListe),
-		%NouvelleListe est la nouvelle liste modifiee
+		modifier( ListeAutre, Position, Value1, Tmp),		% Tmp est la nouvelle liste modifiee
+		modifier(Liste,PositionDepart,R1,NouvelleListe),	% NouvelleListe est la nouvelle liste modifiee
 		retract(tablejoueur(Joueur,Liste, PointsUn)),
- 		asserta(tablejoueur(Joueur,NouvelleListe, PointsUn)),
+ 		asserta(tablejoueur(Joueur,NouvelleListe, PointsUn)),	% On enregistre le nouvel etat du joueur Joueur
 		retract(tablejoueur(Autre,ListeAutre, PointsDeux)),
- 		asserta(tablejoueur(Autre,Temp, PointsDeux)),
+ 		asserta(tablejoueur(Autre,Tmp, PointsDeux)),			% On enregistre le nouvel etat de son adversaire
 		verif_compte_points(Joueur, Autre, Position, R1, Value1).
+			% À quoi sert cette fonction ?
 
-%Verification de fin
-victoire(Joueur):-
-		tablejoueur(Joueur, Liste, Points),
-		write(' Victoire du joueur: '),write(Joueur), write(' avec un score de '),write(Points).
-
-egalite:- write('Egalite entre les deux joueurs!').
-
-
-%Verification que la liste donnée a toutes ses cases à 0
-verif_position_zero(Liste, 6, 0, Retour):-
-		prendre(Liste, 0, R),
+	%Verification que la liste donnée a toutes ses cases à 0
+verif_position_zero( Liste, 6, 0, Retour):-
+		prendre( Liste, 0, R),
 		Retour is R+1,
 		!.
-		
+
 verif_position_zero(Liste, Position, 0, Retour):-
 		prendre(Liste, Position, R),
 		( R <  1 ->
@@ -181,13 +230,14 @@ verif_position_zero(Liste, Position, 0, Retour):-
 				verif_position_zero(Liste, NewPosition, 0, Retour);
 				Retour is R-R
 		).
-%On verifie que, quoi que le joueur joue, aucune graine arrivera sur le terrain ennemi
+
+	%On verifie que, quoi que le joueur joue, aucune graine arrivera sur le terrain ennemi
 verif_liste_autre(Liste, 0, Retour):-
 		prendre(Liste, 0, R),
 		ValeurTest is 5 - R,
 		( 0 =< ValeurTest ->
 				Retour is R- R;
-				Retour is Position +1
+				Retour is Position +1 % /!\ Position n'est pas définie ! (enfin pas là, je crois)
 		),
 		!.
 
@@ -200,7 +250,7 @@ verif_liste_autre(Liste, Position, Retour):-
 				Retour is Position
 		).
 		
-%On verifie si on est en position de blocage en fin de jeu
+	%On verifie si on est en position de blocage en fin de jeu
 verif_blocage(Joueur,Autre, RetourVerif):-
 		tablejoueur(Joueur, Liste, Points),
 		tablejoueur(Autre,ListeAutre, PointsAutre),
@@ -211,7 +261,7 @@ verif_blocage(Joueur,Autre, RetourVerif):-
 				write('')
 		).
 		
-%On compte les points restants sur le plateau pour les ajouter au score final		
+	%On compte les points restants sur le plateau pour les ajouter au score final		
 prendre_points_fin(Joueur, 6, NewPoints):-
 		!.
 		
@@ -225,7 +275,7 @@ prendre_points_fin(Joueur, Position, PointsTemp):-
  		asserta(tablejoueur(Joueur,Liste, NewPoints)),
 		prendre_points_fin(Joueur, NewPosition, PointsTemp).
 
-%Le jeu est en blocage, on compte donc les points pour connaitre le vainqueur
+	%Le jeu est en blocage, on compte donc les points pour connaitre le vainqueur
 fin_jeu_decompte_points(Joueur,Autre):-
 		prendre_points_fin(Joueur, 0, NewPoints),
 		tablejoueur(Joueur, Liste, Points),
@@ -261,8 +311,7 @@ verification_fin(Joueur,Autre):-
 				)	
 		).
 
-% Mise à jour de la table en fonction de l'action demandé par l'utilisateur
-
+	% Mise à jour de la table en fonction de l'action demandé par l'utilisateur
 majtable(Joueur,Autre,PositionDepart,PositionAvancer) :-	
 							tablejoueur(Joueur, Liste, PointsUn),
 							tablejoueur(Autre,ListeAutre, PointsDeux),
@@ -287,39 +336,49 @@ majtable(Joueur,Autre,PositionDepart,PositionAvancer) :-
 												majtable(Joueur,Autre,PositionDepart,NouvellePosition);
 												write('')
 											)
-										;write(''))
-										;(R > 0 ->
+										;
+											write('')
+										)
+									;
+										(R > 0 ->
 											deplacer(Joueur,Autre,NouvellePosition,PositionDepart,R1),
 											(R1 > 0 ->
 												majtable(Joueur,Autre,PositionDepart,NouvellePosition);
 												write('')
 											)
-										;write(''))
+										;
+											write('')
+										)
 									)
 								)
 							).
 
-%----------------------------------------------------------------------------%
-% Fonction permettant de connaitre les coups engendrant une prise
+
+% ---------------------------------------------------
+% -----		FONCTIONS D'IA
+% ---------------------------------------------------
+%
+% Nous avons ici les fonctions d'assistance à l'utilisateur, ou décrivant le fonctionnement de l'IA
+%
+	% Fonction permettant de connaitre les coups engendrant une prise
 coup_prise(Joueur,Autre) :-
 			tablejoueur(Joueur, Liste, PointsUn),
 			tablejoueur(Autre,ListeAutre, PointsDeux),
 			parcoure(ListeAutre,Compteur),
 			test(Liste,5).
-			
 
-% Fonction qui selectionne toute les positions possible de de prise possible sans prise en compte de la liste du joueur courant
+	% Fonction qui selectionne toute les positions possible de de prise possible sans prise en compte de la liste du joueur courant
 parcoure([],0).
-parcoure([X|Q],Compteur):- 
+parcoure([X|Q], Compteur):- 
 		X=<2,
 		X>0,
-		parcoure(Q,Compteur1),
+		parcoure(Q, Compteur1),
 		Compteur is Compteur1+1,
 		Resultat is 6-Compteur1,
 		asserta(possible(Resultat)).
-		
-		
-parcoure([X|Q],Compteur) :- parcoure(Q,Compteur1),Compteur is Compteur1+1.
+parcoure([X|Q],Compteur) :-
+		parcoure(Q,Compteur1),
+		Compteur is Compteur1+1.
 
 %Fonction prenant en compte la liste du joueur courant
 
@@ -333,11 +392,10 @@ test(Liste,Position):- 	possible(X),
 				prendre(Liste,Position,Y),	
 				Z is Position+Y+1,
 				(Z =< 6 ->
-					write('') % Pourquoi mettre un write si on marque rien ? Oo
-								% D'autant que lorsqu'il arrive là, il fait rien de plus, et la position fait 6, 5, 4, 3, 2, 1, 0, -1 sans rien faire
+					write('')
 				;
 					(Z >12 ->
-						write('') % Même chose
+						write('')
 					;
 						B is X+6,
 						(Z == B ->
@@ -350,19 +408,108 @@ test(Liste,Position):- 	possible(X),
 			),
 			Position1 is Position-1,
 			test(Liste,Position1).
-					
+
+
+% deplacer_deux_listes(Joueur,Autre,Position,PositionDepart,R1):- 
+		% tablejoueur(Joueur, Liste, PointsUn),
+		% tablejoueur(Autre,ListeAutre, PointsDeux),
+		% prendre(ListeAutre,Position,Value),
+		% %Value est la valeur de la case a laquelle on ajoute 1
+		% prendre(Liste,PositionDepart,R),
+		% %R est la valeur actuelle de la case de départ
+		% R1 is R-1,
+		% Value1 is Value+1,
+		% modifier(ListeAutre,Position,Value1,Temp),
+		% %Temp est la nouvelle liste modifiee
+		% modifier(Liste,PositionDepart,R1,NouvelleListe),
+		% %NouvelleListe est la nouvelle liste modifiee
+		% retract(tablejoueur(Joueur,Liste, PointsUn)),
+ 		% asserta(tablejoueur(Joueur,NouvelleListe, PointsUn)),
+		% retract(tablejoueur(Autre,ListeAutre, PointsDeux)),
+ 		% asserta(tablejoueur(Autre,Temp, PointsDeux)),
+		% verif_compte_points(Joueur, Autre, Position, R1, Value1).
+
+% majtable(Joueur,Autre,PositionDepart,PositionAvancer) :-	
+							% tablejoueur(Joueur, Liste, PointsUn),
+							% tablejoueur(Autre,ListeAutre, PointsDeux),
+							% prendre(Liste,PositionDepart,R),
+							% %R est la valeur de la case choisie
+							% NouvellePosition is PositionAvancer+1,
+							% %Premiere condition pour gérer les cas ou on repasse sur la case qui distribue
+							% (NouvellePosition = PositionDepart ->
+								% majtable(Joueur,Autre,PositionDepart,NouvellePosition);
+								% %Deuxième condition qui vérifie si que l'on retourne sur le plateau du joueur actuel si on a beaucoup de jetons
+								% (NouvellePosition > 11 ->
+									% PositionTemp is NouvellePosition -13,
+									% majtable(Joueur,Autre,PositionDepart,PositionTemp);
+									% %Troisieme condition qui vérifie si l'on distribue sur le plateau de l'adversaire
+									% (NouvellePosition > 5 ->
+										% (R > 0 ->
+										
+											% PositionChaineDeux is NouvellePosition-6,
+											% deplacer_deux_listes(Joueur,Autre,PositionChaineDeux,PositionDepart,R1),
+											% (R1 > 0 ->
+												% majtable(Joueur,Autre,PositionDepart,NouvellePosition);
+												% write('')
+											% )
+										% ;
+											% write('')
+										% )
+									% ;
+										% (R > 0 ->
+											% deplacer(Joueur,Autre,NouvellePosition,PositionDepart,R1),
+											% (R1 > 0 ->
+												% majtable(Joueur,Autre,PositionDepart,NouvellePosition);
+												% write('')
+											% )
+										% ;
+											% write('')
+										% )
+									% )
+								% )
+							% ).
+
+		% modifier(Liste,Position,Valeur,NouvelleListe)
 		
-victoire_en_un_coup:-
+% etat_suivant_potentiel(CaseChoisie, EtatSuivantJoueur, PointsSuivantJoueur, EtatSuivantAdversaire, PointsSuivantAdversaire):- % On doit lui envoyer la case choisie par l'utilisateur
+		% joueur(Joueur),
+		% adversaire(Adversaire),
+		% tablejoueur(Joueur, ListeJoueur, PointsJoueur),
+		% tablejoueur(Adversaire, ListeAdversaire, PointsAdversaire),
+		% etat_suivant_potentiel( ListeJoueur, PointsJoueur, ListeAdversaire, PointsAdversaire, CaseChoisie, CaseChoisie, JoueurEnCours, EtatSuivantJoueur, EtatSuivantAdversaire)
+		% .
+		
+		
+% etat_suivant_potentiel( ListeJoueur, PointsJoueur, EtatAdversaire, PointsAdversaire, Position, PositionDepart, JoueurEnCours, EtatSuivantJoueur, EtatSuivantAdversaireAdversaire):-
+		% prendre(ListeJoueur, PositionDepart, Deplacement),
+		% ( Deplacement > 0 ->
+			% NouveauDeplacement is Deplacement - 1,
+			% modifier(ListeJoueur, PositionDepart, Deplacement, EtatIntermédiaireJoueur),
+			% ( JoueurEnCours == joueur ->
+				% prendre(ListeJoueur, Position, Valeur), % On récupère Valeur à la position Position dans ListeJoueur
+				% NouvelleValeur is Valeur + 1, % On l'incrémente de 1
+				% modifier(EtatIntermédiaireJoueur, Position, NouvelleValeur, EtatIntermédiaireJoueur2)
+			
+			% )	
+		% ).
+		
+
+victoire_en_un_coup(PositionChoisie):- % S'efface si la position permet de gagner
 		joueur(Joueur),
-		adversaire(Adversaire),
+		adversaire(Adversaire)
+		% En cours de rédaction
+		.
 
 
 
-%---------------------------------------------------------------------------------------%
-		
+% ---------------------------------------------------
+% -----		FONCTIONS PRINCIPALES
+% ---------------------------------------------------
+%
+% Nous avons ici les fonctions qui servent au lancement du jeu
+%
 
-%Interrogation Joueur
-
+% Fonction décrivant un tour de jeu
 jouer:-
 		joueur(X),
 		adversaire(Y),
@@ -392,10 +539,7 @@ jouer:-
 		verification_fin(X,Y).
 
 % Fonction principale du projet
-
-boucle_menu:- repeat,jouer,!.
-
-main:- init, boucle_menu.
+main:- init, repeat, jouer, !.
 
 
 
